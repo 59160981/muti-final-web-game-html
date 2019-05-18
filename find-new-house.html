@@ -1,0 +1,254 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Find New House Game</title>
+    <script type="text/javascript" src="simpleGame.js"></script>
+    <script type="text/javascript">
+        var game;
+        var timer;
+        var time;
+
+        var bg;
+        var plane;
+        var rock1;
+        var rock2;
+        var rock3;
+        var a= 0;
+
+        var MAXROCK1 = 3;
+        var MAXROCK2 = 2;
+        function init() {
+            game = new Scene();
+            bg = new Sprite(game, "space-bg.jpg", 600,350);
+            bg.setSpeed(0)
+            bg.setAngle(180)
+            bg.setPosition(175,300)
+
+            timer = new Timer();
+
+            plane = new Plane();
+            setupRock1()
+            setupRock2()
+            rock3 = new Rock3();
+
+            game.start();
+        }
+
+        function update() {
+            game.clear();
+            
+            plane.checkKeys();
+            plane.checkDrag();
+            updateTime()
+
+            bg.update();
+            
+            rock3.update();
+            rock3.reset();
+            
+
+            for (var i = 0; i < MAXROCK1; i++) {
+                rock1[i].update();
+                rock1[i].reset();
+                checkCollisionRock1(i);
+            }
+            for (var i = 0; i < MAXROCK2; i++) {
+                rock2[i].update();
+                rock2[i].reset();
+                checkCollisionRock2(i);
+            }
+            checkCollisionRock3();
+            plane.update();
+            endGame()
+        }
+
+        // orther functions
+        // time
+        function updateTime(){
+            time = timer.getElapsedTime();
+            document.getElementById('time').innerHTML = "\nTime : "+Math.floor(time)+" s";
+        }
+        // check ชน
+        function checkCollisionRock1(ROCK1){
+            if(plane.collidesWith(rock1[ROCK1])){
+                plane.changeImage("plane-boom.png");
+                a+=1;
+            }
+        }
+        function checkCollisionRock2(ROCK2){
+            if(plane.collidesWith(rock2[ROCK2])){
+                plane.changeImage("plane-boom.png");
+                a+=1;
+            }
+        }
+        function checkCollisionRock3(){
+            if(plane.collidesWith(rock3)){
+                plane.changeImage('plane-boom.png')
+                a+=1;
+            }
+        }
+        function endGame(){
+            if(a==2){
+                game.stop();
+                document.getElementById("time").style.display = "none";
+                document.getElementById('timeOver').innerHTML = "\nTime : "+Math.floor(time)+" s";
+                document.getElementById("timeOver").style.display = "block";
+                document.getElementById("gameOver").style.display = "block";
+            }
+        }
+        // plane
+        function Plane() {
+            tPlane = new Sprite(game, "plane.png", 35, 35);
+            tPlane.setSpeed(0);
+            tPlane.setPosition(175, 550)
+            tPlane.checkKeys = function () {
+                if (keysDown[K_LEFT]) {
+                    if (this.x <= 21) {
+                        this.setSpeed(0);
+                    } else {
+                        this.addVector(270, 2);
+                    }
+                }
+                if (keysDown[K_RIGHT]) {
+                    if (this.x >= 332) {
+                        this.setSpeed(0);
+                    } else {
+                        this.addVector(90, 2);
+                    }
+                }
+            }
+            tPlane.checkDrag = function () {
+                speed = this.getSpeed();
+                speed *= .82;
+                this.setSpeed(speed);
+            }
+            return tPlane;
+        }
+        // rock1
+        function Rock1() {
+            tRock1 = new Sprite(game, "rock1.png", 35, 35);
+            tRock1.setSpeed(0);
+            tRock1.setPosition(175, 10)
+            var newX = Math.floor(Math.random() * 332) + 10;
+            var speed = Math.floor(Math.random() * 10) + 5;
+            tRock1.setPosition(newX, 0)
+            tRock1.addVector(180, speed);
+            tRock1.reset = function () {
+                if (this.y >= 580) {
+                    newX = Math.floor(Math.random() * 332) + 10;
+                    speed = Math.floor(Math.random() * 10) + 5;
+                    this.setPosition(newX, 0)
+                    this.setSpeed(speed)
+                }
+            }
+            return tRock1;
+        }
+        function setupRock1() {
+            rock1 = new Array(MAXROCK1);
+            for (var i = 0; i < MAXROCK1; i++) {
+                rock1[i] = new Rock1();
+                rock1[i].reset();
+            }
+        }
+        // rock2
+        function Rock2() {
+            tRock2 = new Sprite(game, "rock2.png", 50, 50);
+            tRock2.setSpeed(0);
+            tRock2.setPosition(175, 10)
+            var newX = Math.floor(Math.random() * 332) + 10;
+            var speed = Math.floor(Math.random() * 5) + 2;
+            tRock2.setPosition(newX, 0)
+            tRock2.addVector(180, speed);
+            tRock2.reset = function () {
+                if (this.y >= 580) {
+                    newX = Math.floor(Math.random() * 332) + 10;
+                    speed = Math.floor(Math.random() * 5) + 2;
+                    this.setPosition(newX, 0)
+                    this.setSpeed(speed)
+                }
+            }
+            return tRock2;
+        }
+        function setupRock2() {
+            rock2 = new Array(MAXROCK2);
+            for (var i = 0; i < MAXROCK2; i++) {
+                rock2[i] = new Rock2();
+                rock2[i].reset();
+            }
+        }
+        // rock3
+        function Rock3() {
+            tRock3 = new Sprite(game, "rock3.png", 130, 130);
+            tRock3.setSpeed(0);
+            tRock3.setPosition(175, 10)
+            var newX = Math.floor(Math.random() * 332) + 10;
+            var speed = Math.floor(Math.random() * 2) + 1;
+            tRock3.setPosition(newX, 0)
+            tRock3.addVector(180, speed);
+            tRock3.reset = function () {
+                if (this.y >= 580) {
+                    newX = Math.floor(Math.random() * 332) + 10;
+                    speed = Math.floor(Math.random() * 2) + 1;
+                    this.setPosition(newX, 0)
+                    this.setSpeed(speed)
+                }
+            }
+            return tRock3;
+        }
+    </script>
+    <style>
+        .button {
+          display: inline-block;
+          border-radius: 4px;
+          background-color: #000000;
+          border: none;
+          color: #FFFFFF;
+          text-align: center;
+          font-size: 28px;
+          padding: 20px;
+          width: 150px;
+          transition: all 0.5s;
+          cursor: pointer;
+          margin: 5px;
+        }
+        
+        .button span {
+          cursor: pointer;
+          display: inline-block;
+          position: relative;
+          transition: 0.5s;
+        }
+        
+        .button span:after {
+          content: '\00bb';
+          position: absolute;
+          opacity: 0;
+          top: 0;
+          right: -20px;
+          transition: 0.5s;
+        }
+        
+        .button:hover span {
+          padding-right: 25px;
+        }
+        
+        .button:hover span:after {
+          opacity: 1;
+          right: 0;
+        }
+        </style>
+</head>
+
+<body onload="init()">
+    <div style="position: absolute;">
+        <span id="time" style="color: white;font-size: 1.5vw"></span>
+    </div>
+    <span id="timeOver" style="color: white;position: absolute; top: 36%;left: 9%;display: none;font-size: 2vw"></span>
+    <div id="gameOver" style="position: absolute; top: 42%;left: 7.5%;display: none;">
+        <button class="button" style="vertical-align:middle" onclick="location.href=''"><span>Restart </span>
+    </div>
+</body>
+
+</html>
